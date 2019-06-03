@@ -50,11 +50,12 @@ angular.module(
     }}).directive("ngClone",function(){return {
         restrict:"EA",
         link:function(scope,element,attrs,controller,transcludeFn){
+            var selector="";
             element.data(ngHtmlBuilderModule.ng_clone,ngHtmlBuilderModule.collect(element,attrs));
             if (!angular.isUndefined(attrs[ngHtmlBuilderModule.ng_clone])) try {
                 var mark="ng-tmp-"+Math.random().toString(36).substring(2,15)+Math.random().toString(36).substring(2,15);//Mark current element
                 var current=element;//Get current element
-                var selector=attrs[ngHtmlBuilderModule.ng_clone];//Get selector of template element
+                selector=attrs[ngHtmlBuilderModule.ng_clone];//Get selector of template element
                 var template=angular.element(document.querySelector(selector)).clone();//Get template element
                 var replace={};//Replace 
                 ngHtmlBuilderModule.merge(template.data(ngHtmlBuilderModule.ng_template),replace);//Get replace array from template element
@@ -63,7 +64,7 @@ angular.module(
                 current.addClass(mark);
                 var transform=function(template,current,replace){
                     var a=current.data(ngHtmlBuilderModule.ng_use);
-                    if (a) if(angular.isUndefined(a[ngHtmlBuilderModule.ng_use])) try {
+                    if (a) if(!angular.isUndefined(a[ngHtmlBuilderModule.ng_use])) try {
                         var found=angular.element(document.querySelector("."+mark+" "+a[ngHtmlBuilderModule.ng_use]));//Find in current element
                         if (found){//If found then use it
                             template.replaceWith(found);
@@ -72,6 +73,7 @@ angular.module(
                         }
                         return(false);//Don't go deeper
                     } catch (e){
+                        console.error("Unable to find ng-use element (selector: \""+a[ngHtmlBuilderModule.ng_use]+"\")");
                         return(false);//Don't go deeper
                     }
                     return(true);//Go deeper
@@ -86,6 +88,7 @@ angular.module(
                 current.removeClass(mark);
                 element.replaceWith(template);//Replace current element with tamplate
             } catch (e){
+                console.error("Unable to find ng-template element (selector: \""+selector+"\")");
                 element.remove();
             }
         }
