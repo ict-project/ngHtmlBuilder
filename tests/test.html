@@ -31,7 +31,7 @@
     </head>
     <body ng-controller="bodyCtrl">
         <!-- Template 1 -->
-        <div class="container ng-template" id="ng-template-container">
+        <div class="container ng-template" id="ng-template-containers">
             <ng-use ng-selector="> *"/>
         </div>
         <!-- Template 2 -->
@@ -48,7 +48,11 @@
                 </ng-use>
             </div>
         </div>
-        
+        <!-- Template 3 -->
+        <div class="container ng-template" id="ng-template-container">
+            <ng-use ng-selector="> *"/>
+        </div>
+
         <ng-clone ng-selector="#ng-template-container" >
             <!-- Clone no 1 -->
             <ng-clone ng-selector="#ng-template-panel" $title$="Clone no 1 title">
