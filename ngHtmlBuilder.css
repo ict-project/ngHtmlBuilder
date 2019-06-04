@@ -1,9 +1,9 @@
 .ng-template {
-    display: none;
+    display: none !important;
 }
 ng-use {
-    display: none;
+    display: none !important;
 }
 ng-clone {
-    display: none;
+    display: none !important;
 }

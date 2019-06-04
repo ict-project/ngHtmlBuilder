@@ -31,13 +31,18 @@
     </head>
     <body ng-controller="bodyCtrl">
         <!-- Template 1 -->
-        <div class="container ng-template" id="ng-template-containers">
-            <ng-use ng-selector="> *"/>
-        </div>
+        <span class="ng-template" id="ng-template-label" $type$="primary" $text$="">
+            <span class="label label-$type$">
+                $text$
+            </span>
+        </span>
         <!-- Template 2 -->
         <div class="panel panel-default ng-template" id="ng-template-panel" $title$="Default title">
             <div class="panel-heading">
-                <h3>$title$</h3>
+                <h3>
+                    $title$
+                    <ng-clone ng-selector="#ng-template-label" $text$=":-)"/>
+                </h3>
             </div>
             <div class="panel-body">
                 <ng-use ng-selector="[ng-template-content=&quot;1&quot;]">
@@ -57,7 +62,7 @@
             <!-- Clone no 1 -->
             <ng-clone ng-selector="#ng-template-panel" $title$="Clone no 1 title">
                 <div ng-template-content=1>
-                    <p>Witaj świecie 1 !!!</p>
+                    <p>Witaj świecie 1 !!!<ng-clone ng-selector="#ng-template-label" $type$="danger" $text$="!!!"/></p>
                 </div>
                 <div ng-template-content=2>
                     <p>Witaj świecie 2 !!!</p>
