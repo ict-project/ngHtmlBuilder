@@ -65,7 +65,7 @@ angular.module(
         link:function(scope,element,attrs,controller,transcludeFn){
             //Do nothing
         }
-    }}).directive(ngHtmlBuilderModule.ngClone,function(){return {
+    }}).directive(ngHtmlBuilderModule.ngClone,function($compile){return {
         restrict:"E",
         link:function(scope,element,attrs,controller,transcludeFn){
             var selector="";
@@ -128,6 +128,7 @@ angular.module(
                 element.removeClass(mark);
                 template.removeClass(ngHtmlBuilderModule.ng_template);
                 if (template[0]) if (template[0].id) template[0].id=template[0].id+"-"+ngHtmlBuilderModule.randomString();
+                $compile(template.contents())(scope);
                 element.replaceWith(template);//Replace current element with tamplate
             } catch (e){
                 console.error("ERROR: Unable to find "+ngHtmlBuilderModule.ng_template+" element (selector: \""+selector+"\")",e);

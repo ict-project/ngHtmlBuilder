@@ -26,6 +26,7 @@
         <script>
             angular.module("testApp",["ngHtmlBuilder"])
                 .controller("bodyCtrl",function($scope){
+                    $scope.testValue="Cześć!!!";
                 });
         </script>
     </head>
@@ -49,7 +50,7 @@
                     <p>Default content no 1</p>
                 </ng-use>
                 <ng-use ng-selector="[ng-template-content=&quot;2&quot;]">
-                    <p>Default content no 2</p>
+                    <p>Default content no 2 - {{testValue}}</p>
                 </ng-use>
             </div>
         </div>
@@ -78,7 +79,7 @@
             <!-- Clone no 3 -->
             <ng-clone ng-selector="#ng-template-panel">
                 <div ng-template-content=2>
-                    <p>Witaj świecie 2 !!!</p>
+                    <p>{{testValue}} świecie 2 !!!</p>
                 </div>
             </ng-clone>
         </ng-clone>
