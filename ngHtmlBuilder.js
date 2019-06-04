@@ -1,16 +1,16 @@
-var ngHtmlBuilderModule={
+var ngHtmlBuilderModule=new function(){
     //Source: https://github.com/angular/angular.js/blob/v1.3.10/src/Angular.js#L1447-L1453
-    snake_case:function(name){
-      return name.replace(/[A-Z]/g,function(letter,pos){
-        return (pos?'-':'')+letter.toLowerCase();
-      });
-    },
+    this.snake_case=function(name){
+        return name.replace(/[A-Z]/g,function(letter,pos){
+            return (pos?'-':'')+letter.toLowerCase();
+        });
+    };
     //Gets random string
-    randomString:function(){
+    this.randomString=function(){
         return(Math.random().toString(36).substring(2,15)+Math.random().toString(36).substring(2,15));
-    },
+    };
     //Collects replace strings from attrs
-    collect:function(element,attrs){
+    this.collect=function(element,attrs){
         var output={};
         angular.forEach(attrs,function(value,key){
             if (this.regex.test(key)) {
@@ -23,15 +23,15 @@ var ngHtmlBuilderModule={
             regex:/^\$\w+\$$/i,
         });
         return(output);
-    },
+    };
     //Merge replace strings in one object
-    merge:function(input,output) {
+    this.merge=function(input,output) {
         for (var key in input) 
             if (input.hasOwnProperty(key)) 
                 output[key] = input[key];
-    },
+    };
     //Replace strings
-    replace:function(input,replace) {
+    this.replace=function(input,replace) {
         var output=new String(input);
         for (var key in replace) 
             if (replace.hasOwnProperty(key)) {
@@ -39,12 +39,16 @@ var ngHtmlBuilderModule={
                 output=output.replace(regex,replace[key]);
             }
         return(output);
-    },
-    ngTemplate:"ngTemplate",
-    ngUse:"ngUse",
-    ngClone:"ngClone",
-    ngSelector:"ngSelector",
-}
+    };
+    this.ngTemplate="ngTemplate";
+    this.ng_template=this.snake_case(this.ngTemplate);
+    this.ngUse="ngUse";
+    this.ng_use=this.snake_case(this.ngUse);
+    this.ngClone="ngClone";
+    this.ng_clone=this.snake_case(this.ngClone);
+    this.ngSelector="ngSelector";
+    this.ng_selector=this.snake_case(this.ngSelector);
+}();
 angular.module(
     "ngHtmlBuilder",
     []
@@ -52,7 +56,7 @@ angular.module(
         restrict:"C",
         link:function(scope,element,attrs,controller,transcludeFn){
             element.data(
-                ngHtmlBuilderModule.snake_case(ngHtmlBuilderModule.ngTemplate),
+                ngHtmlBuilderModule.ng_template,
                 ngHtmlBuilderModule.collect(element,attrs)
             );
         }
@@ -66,11 +70,11 @@ angular.module(
         link:function(scope,element,attrs,controller,transcludeFn){
             var selector="";
             element.data(
-                ngHtmlBuilderModule.snake_case(ngHtmlBuilderModule.ngClone),
+                ngHtmlBuilderModule.ng_clone,
                 ngHtmlBuilderModule.collect(element,attrs)
             );
             if (angular.isUndefined(attrs[ngHtmlBuilderModule.ngSelector])) {
-                console.warn("WARN: Unable to find selector (attribute \""+ngHtmlBuilderModule.snake_case(ngHtmlBuilderModule.ngSelector)+"\") in "+ngHtmlBuilderModule.snake_case(ngHtmlBuilderModule.ngClone)+" element");
+                console.warn("WARN: Unable to find selector (attribute \""+ngHtmlBuilderModule.ng_selector+"\") in "+ngHtmlBuilderModule.ng_clone+" element");
                 element.remove();
             } else try {
                 var mark="ng-tmp-"+ngHtmlBuilderModule.randomString();//Mark current element
@@ -78,11 +82,11 @@ angular.module(
                 var template=angular.element(document.querySelector(selector));//Get template element
                 var replace={};//Replace 
                 ngHtmlBuilderModule.merge(
-                    template.data(ngHtmlBuilderModule.snake_case(ngHtmlBuilderModule.ngTemplate)),
+                    template.data(ngHtmlBuilderModule.ng_template),
                     replace
                 );//Get replace array from template element
                 ngHtmlBuilderModule.merge(
-                    element.data(ngHtmlBuilderModule.snake_case(ngHtmlBuilderModule.ngClone)),
+                    element.data(ngHtmlBuilderModule.ng_clone),
                     replace
                 );//Get replace array from current element
                 template=template.clone();//Clone template
@@ -101,12 +105,12 @@ angular.module(
                         name=template[0].nodeName.toLowerCase();
                         type=template[0].nodeType;
                     }
-                    if ((type!=1)||(name!=ngHtmlBuilderModule.snake_case(ngHtmlBuilderModule.ngUse))) {
+                    if ((name!=ngHtmlBuilderModule.ng_use)||(type!=1)) {
                         return(true);//Go deeper
                     } else {
-                        var a=template.attr(ngHtmlBuilderModule.snake_case(ngHtmlBuilderModule.ngSelector));
+                        var a=template.attr(ngHtmlBuilderModule.ng_selector);
                         if (!a) {
-                            console.warn("WARN: Unable to find selector (attribute \""+ngHtmlBuilderModule.snake_case(ngHtmlBuilderModule.ngSelector)+"\") in "+ngHtmlBuilderModule.snake_case(ngHtmlBuilderModule.ngUse)+" element");
+                            console.warn("WARN: Unable to find selector (attribute \""+ngHtmlBuilderModule.ng_selector+"\") in "+ngHtmlBuilderModule.ng_use+" element");
                         } else try {
                             var found=angular.element(document.querySelectorAll("."+mark+" "+a));//Find in current element
                             if (found[0]){//If found then use it
@@ -116,17 +120,17 @@ angular.module(
                                 return(true);//Go deeper
                             }
                         } catch (e){
-                            console.error("ERROR: Unable to find "+ngHtmlBuilderModule.snake_case(ngHtmlBuilderModule.ngUse)+" element (selector: \""+a[ngHtmlBuilderModule.ng_use]+"\")");
+                            console.error("ERROR: Unable to find "+ngHtmlBuilderModule.ng_use+" element (selector: \""+a+"\")",e);
                         }
                     }
                     return(false);//Don't go deeper
                 });
                 element.removeClass(mark);
-                template.removeClass(ngHtmlBuilderModule.snake_case(ngHtmlBuilderModule.ngTemplate));
+                template.removeClass(ngHtmlBuilderModule.ng_template);
                 if (template[0]) if (template[0].id) template[0].id=template[0].id+"-"+ngHtmlBuilderModule.randomString();
                 element.replaceWith(template);//Replace current element with tamplate
             } catch (e){
-                console.error("ERROR: Unable to find "+ngHtmlBuilderModule.snake_case(ngHtmlBuilderModule.ngTemplate)+" element (selector: \""+selector+"\")",e);
+                console.error("ERROR: Unable to find "+ngHtmlBuilderModule.ng_template+" element (selector: \""+selector+"\")",e);
                 element.remove();
             }
         }
