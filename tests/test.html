@@ -25,8 +25,11 @@
 
         <script>
             angular.module("testApp",["ngHtmlBuilder"])
-                .controller("bodyCtrl",function($scope){
-                    $scope.testValue="Cześć!!!";
+                .controller("bodyCtrl",function($scope,$interval){
+                    $interval(function() {
+                        var now=new Date();
+                        $scope.testValue=now.getTime();
+                    },1000,$scope);
                 });
         </script>
     </head>
@@ -79,7 +82,7 @@
             <!-- Clone no 3 -->
             <ng-clone ng-selector="#ng-template-panel">
                 <div ng-template-content=2>
-                    <p>{{testValue}} świecie 2 !!!</p>
+                    <p>{{testValue}} - Witaj świecie 2 !!!</p>
                 </div>
             </ng-clone>
         </ng-clone>
