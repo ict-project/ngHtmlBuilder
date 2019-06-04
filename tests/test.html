@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html ng-app="testApp">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+            
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+            <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <title>ngHtmlBuilder - Tests</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+        <script src="../ngHtmlBuilder.js"></script>
+        <link rel="stylesheet" href="../ngHtmlBuilder.css" />
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+        <script>
+            angular.module("testApp",["ngHtmlBuilder"])
+                .controller("bodyCtrl",function($scope){
+                });
+        </script>
+    </head>
+    <body ng-controller="bodyCtrl">
+        <!-- Template -->
+        <div class="panel panel-default ng-template" id="ng-template-panel" $title$="Default title">
+            <div class="panel-heading">
+                <h3>$title$</h3>
+            </div>
+            <div class="panel-body">
+                <ng-use ng-selector="[ng-template-content=&quot;1&quot;]">
+                    <p>Default content no 1</p>
+                </ng-use>
+                <ng-use ng-selector="[ng-template-content=&quot;2&quot;]">
+                    <p>Default content no 2</p>
+                </ng-use>
+            </div>
+        </div>
+        
+        <div class="container">
+            <!-- Clone no 1 -->
+            <ng-clone ng-selector="#ng-template-panel" $title$="Clone no 1 title">
+                <div ng-template-content=1>
+                    <p>Witaj świecie 1 !!!</p>
+                </div>
+                <div ng-template-content=2>
+                    <p>Witaj świecie 2 !!!</p>
+                </div>
+            </ng-clone>
+            
+            <!-- Clone no 2 -->
+            <ng-clone ng-selector="#ng-template-panel" $title$="Clone no 2 title">
+                <div ng-template-content=1>
+                </div>
+            </ng-clone>
+            
+            <!-- Clone no 3 -->
+            <ng-clone ng-selector="#ng-template-panel">
+                <div ng-template-content=2>
+                    <p>Witaj świecie 2 !!!</p>
+                </div>
+            </ng-clone>
+        </div>
+    </body>
+</html>

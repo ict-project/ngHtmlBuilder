@@ -1,6 +1,6 @@
-ng-template {
-    visibility:hidden;
+.ng-template {
+    display: none;
 }
 ng-use {
-    visibility:hidden;
+    display: none;
 }
