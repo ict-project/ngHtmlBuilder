@@ -108,7 +108,7 @@ angular.module(
                         if (!a) {
                             console.warn("WARN: Unable to find selector (attribute \""+ngHtmlBuilderModule.snake_case(ngHtmlBuilderModule.ngSelector)+"\") in "+ngHtmlBuilderModule.snake_case(ngHtmlBuilderModule.ngUse)+" element");
                         } else try {
-                            var found=angular.element(document.querySelector("."+mark+" "+a));//Find in current element
+                            var found=angular.element(document.querySelectorAll("."+mark+" "+a));//Find in current element
                             if (found[0]){//If found then use it
                                 template.replaceWith(found);
                             } else {//If not found then use children of template elements (default content)
