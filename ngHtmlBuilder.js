@@ -113,6 +113,7 @@ angular.module(
                                 template.replaceWith(found);
                             } else {//If not found then use children of template elements (default content)
                                 template.replaceWith(template.children().clone());
+                                return(true);//Go deeper
                             }
                         } catch (e){
                             console.error("ERROR: Unable to find "+ngHtmlBuilderModule.snake_case(ngHtmlBuilderModule.ngUse)+" element (selector: \""+a[ngHtmlBuilderModule.ng_use]+"\")");
