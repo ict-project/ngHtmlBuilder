@@ -1,6 +1,6 @@
 var ngHtmlBuilderModule=new function(){
     this.normalizeSelector=function(input){
-        return(input.replace(/\[([\w\-]+)([\~\|\^\$\*])?=\'(.*)\'\]/gi,"[$1$2=\"$3\"]"));
+        return(input.replace(/\[([\w\-]+)([\~\|\^\$\*])?=\'([^\']*)\'\]/gi,"[$1$2=\"$3\"]"));
     };
     //Source: https://github.com/angular/angular.js/blob/v1.3.10/src/Angular.js#L1447-L1453
     this.snake_case=function(name){
