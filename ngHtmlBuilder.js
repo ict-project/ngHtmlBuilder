@@ -1,4 +1,7 @@
 var ngHtmlBuilderModule=new function(){
+    this.normalizeSelector=function(input){
+        return(input.replace(/\[([\w\-]+)([\~\|\^\$\*])?=\'(.*)\'\]/gi,"[$1$2=\"$3\"]"));
+    };
     //Source: https://github.com/angular/angular.js/blob/v1.3.10/src/Angular.js#L1447-L1453
     this.snake_case=function(name){
         return name.replace(/[A-Z]/g,function(letter,pos){
@@ -79,7 +82,7 @@ angular.module(
             } else try {
                 var mark="ng-tmp-"+ngHtmlBuilderModule.randomString();//Mark current element
                 selector=attrs[ngHtmlBuilderModule.ngSelector];//Get selector of template element
-                var template=angular.element(document.querySelector(selector));//Get template element
+                var template=angular.element(document.querySelector(ngHtmlBuilderModule.normalizeSelector(selector)));//Get template element
                 var replace={};//Replace 
                 ngHtmlBuilderModule.merge(
                     template.data(ngHtmlBuilderModule.ng_template),
@@ -112,7 +115,7 @@ angular.module(
                         if (!a) {
                             console.warn("WARN: Unable to find selector (attribute \""+ngHtmlBuilderModule.ng_selector+"\") in "+ngHtmlBuilderModule.ng_use+" element");
                         } else try {
-                            var found=angular.element(document.querySelectorAll("."+mark+" "+a));//Find in current element
+                            var found=angular.element(document.querySelectorAll("."+mark+" "+ngHtmlBuilderModule.normalizeSelector(a)));//Find in current element
                             if (found[0]){//If found then use it
                                 template.replaceWith(found);
                             } else {//If not found then use children of template elements (default content)
