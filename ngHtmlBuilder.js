@@ -79,17 +79,18 @@ angular.module(
     ).directive(ngHtmlBuilderModule.ngIncludeOnce,function($compile){return {
         restrict:"E",
         link:function(scope,element,attrs,controller,transcludeFn){
+            var m=ngHtmlBuilderModule;
             var html=element.html();
             element.html("");
-            ngHtmlBuilderModule.addPromise(ngHtmlBuilderModule.sha256(html).then(function(hash){
+            m.addPromise(m.sha256(html).then(function(hash){
                 if (hash) {
-                    hash=ngHtmlBuilderModule.buf2hex(hash);
+                    hash=m.buf2hex(hash);
                     var key="k"+hash;
-                    if (ngHtmlBuilderModule.htmlBlockTable[key]){
-                        console.debug("DEBUG: HTML block loaded already: "+hash+" at "+ngHtmlBuilderModule.htmlBlockTable[key].toString());
+                    if (m.htmlBlockTable[key]){
+                        console.debug("DEBUG: HTML block loaded already: "+hash+" at "+m.htmlBlockTable[key].toString());
                         html=false;
                     } else {
-                        ngHtmlBuilderModule.htmlBlockTable[key]=new Date();    
+                        m.htmlBlockTable[key]=new Date();    
                     }
                 }
                 if (html){
@@ -105,9 +106,10 @@ angular.module(
     }}).directive(ngHtmlBuilderModule.ngTemplate,function(){return {
         restrict:"C",
         link:function(scope,element,attrs,controller,transcludeFn){
+            var m=ngHtmlBuilderModule;
             element.data(
-                ngHtmlBuilderModule.ng_template,
-                ngHtmlBuilderModule.collect(element,attrs)
+                m.ng_template,
+                m.collect(element,attrs)
             );
         }
     }}).directive(ngHtmlBuilderModule.ngUse,function(){return {
@@ -118,29 +120,30 @@ angular.module(
     }}).directive(ngHtmlBuilderModule.ngClone,function($compile){return {
         restrict:"E",
         link:function(scope,element,attrs,controller,transcludeFn){
+            var m=ngHtmlBuilderModule;
             var selector="";
             element.data(
-                ngHtmlBuilderModule.ng_clone,
-                ngHtmlBuilderModule.collect(element,attrs)
+                m.ng_clone,
+                m.collect(element,attrs)
             );
-            if (angular.isUndefined(attrs[ngHtmlBuilderModule.ngSelector])) {
-                console.warn("WARN: Unable to find selector (attribute \""+ngHtmlBuilderModule.ng_selector+"\") in "+ngHtmlBuilderModule.ng_clone+" element");
+            if (angular.isUndefined(attrs[m.ngSelector])) {
+                console.warn("WARN: Unable to find selector (attribute \""+m.ng_selector+"\") in "+m.ng_clone+" element");
                 element.remove();
             } else try {
-                var mark="ng-tmp-"+ngHtmlBuilderModule.randomString();//Mark current element
-                selector=attrs[ngHtmlBuilderModule.ngSelector];//Get selector of template element
-                var template=angular.element(document.querySelector(ngHtmlBuilderModule.normalizeSelector(selector)));//Get template element
+                var mark="ng-tmp-"+m.randomString();//Mark current element
+                selector=attrs[m.ngSelector];//Get selector of template element
+                var template=angular.element(document.querySelector(m.normalizeSelector(selector)));//Get template element
                 var replace={};//Replace 
-                ngHtmlBuilderModule.merge(
-                    template.data(ngHtmlBuilderModule.ng_template),
+                m.merge(
+                    template.data(m.ng_template),
                     replace
                 );//Get replace array from template element
-                ngHtmlBuilderModule.merge(
-                    element.data(ngHtmlBuilderModule.ng_clone),
+                m.merge(
+                    element.data(m.ng_clone),
                     replace
                 );//Get replace array from current element
                 template=template.clone();//Clone template
-                template.html(ngHtmlBuilderModule.replace(template.html(),replace));//Replace all strings in template.
+                template.html(m.replace(template.html(),replace));//Replace all strings in template.
                 element.addClass(mark);
                 var traverse=function(template,current,replace,tool){//Traverse across nested elements
                     if (tool(template,current,replace)){
@@ -155,14 +158,14 @@ angular.module(
                         name=template[0].nodeName.toLowerCase();
                         type=template[0].nodeType;
                     }
-                    if ((name!=ngHtmlBuilderModule.ng_use)||(type!=1)) {
+                    if ((name!=m.ng_use)||(type!=1)) {
                         return(true);//Go deeper
                     } else {
-                        var a=template.attr(ngHtmlBuilderModule.ng_selector);
+                        var a=template.attr(m.ng_selector);
                         if (!a) {
-                            console.warn("WARN: Unable to find selector (attribute \""+ngHtmlBuilderModule.ng_selector+"\") in "+ngHtmlBuilderModule.ng_use+" element");
+                            console.warn("WARN: Unable to find selector (attribute \""+m.ng_selector+"\") in "+m.ng_use+" element");
                         } else try {
-                            var found=angular.element(document.querySelectorAll("."+mark+" "+ngHtmlBuilderModule.normalizeSelector(a)));//Find in current element
+                            var found=angular.element(document.querySelectorAll("."+mark+" "+m.normalizeSelector(a)));//Find in current element
                             if (found[0]){//If found then use it
                                 template.replaceWith(found);
                             } else {//If not found then use children of template elements (default content)
@@ -170,18 +173,18 @@ angular.module(
                                 return(true);//Go deeper
                             }
                         } catch (e){
-                            console.error("ERROR: Unable to find "+ngHtmlBuilderModule.ng_use+" element (selector: \""+a+"\")",e);
+                            console.error("ERROR: Unable to find "+m.ng_use+" element (selector: \""+a+"\")",e);
                         }
                     }
                     return(false);//Don't go deeper
                 });
                 element.removeClass(mark);
-                template.removeClass(ngHtmlBuilderModule.ng_template);
-                if (template[0]) if (template[0].id) template[0].id=template[0].id+"-"+ngHtmlBuilderModule.randomString();
+                template.removeClass(m.ng_template);
+                if (template[0]) if (template[0].id) template[0].id=template[0].id+"-"+m.randomString();
                 $compile(template.contents())(scope);
                 element.replaceWith(template);//Replace current element with tamplate
             } catch (e){
-                console.error("ERROR: Unable to find "+ngHtmlBuilderModule.ng_template+" element (selector: \""+selector+"\")",e);
+                console.error("ERROR: Unable to find "+m.ng_template+" element (selector: \""+selector+"\")",e);
                 element.remove();
             }
         }
