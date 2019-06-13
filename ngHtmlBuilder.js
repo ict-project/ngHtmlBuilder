@@ -1,4 +1,8 @@
 var ngHtmlBuilderModule=new function(){
+    var promiseChain=new Promise(function(resolve,reject){resolve(false);});
+    this.addPromise=function(next){
+        promiseChain=promiseChain.then(function(){return(next);});
+    };
     this.htmlBlockTable={};
     this.sha256=function(input){
         if (window.crypto){
@@ -77,7 +81,7 @@ angular.module(
         link:function(scope,element,attrs,controller,transcludeFn){
             var html=element.html();
             element.html("");
-            ngHtmlBuilderModule.sha256(html).then(function(hash){
+            ngHtmlBuilderModule.addPromise(ngHtmlBuilderModule.sha256(html).then(function(hash){
                 if (hash) {
                     hash=ngHtmlBuilderModule.buf2hex(hash);
                     var key="k"+hash;
@@ -96,7 +100,7 @@ angular.module(
                 } else {
                     element.remove();
                 }
-            });
+            }));
         }
     }}).directive(ngHtmlBuilderModule.ngTemplate,function(){return {
         restrict:"C",
