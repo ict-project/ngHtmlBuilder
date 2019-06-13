@@ -86,5 +86,13 @@
                 </div>
             </ng-clone>
         </ng-clone>
+        <ng-clone ng-selector="#ng-template-container" >
+            <ng-include-once><p>Only once</p></ng-include-once>
+            <ng-include-once><p>Only once</p></ng-include-once>
+            <ng-include-once><p>Only once: 2</p></ng-include-once>
+            <ng-include-once><p>Only once: 2</p></ng-include-once>
+            <ng-include-once><p>Only once</p></ng-include-once>
+            <ng-include-once><p>Only once: 2</p></ng-include-once>
+        </ng-clone>
     </body>
 </html>

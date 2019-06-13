@@ -1,4 +1,19 @@
 var ngHtmlBuilderModule=new function(){
+    this.htmlBlockTable={};
+    this.sha256=function(input){
+        if (window.crypto){
+            const encoder=new TextEncoder();
+            const data=encoder.encode(input);
+            var output=window.crypto.subtle.digest('SHA-256',data);
+            if (output.result) return(new Promise(function(resolve,reject){resolve(output.result);}));
+            return(output);
+        }
+        console.warn("WARN: Module window.crypto not present!!!");
+        return(false);
+    };
+    this.buf2hex=function(buffer){
+        return(Array.prototype.map.call(new Uint8Array(buffer),x=>('00'+x.toString(16)).slice(-2)).join(''));
+    };
     this.normalizeSelector=function(input){
         return(input.replace(/\[([\w\-]+)([\~\|\^\$\*])?=\'([^\']*)\'\]/gi,"[$1$2=\"$3\"]"));
     };
@@ -43,6 +58,8 @@ var ngHtmlBuilderModule=new function(){
             }
         return(output);
     };
+    this.ngIncludeOnce="ngIncludeOnce";
+    this.ng_include_once=this.snake_case(this.ngIncludeOnce);
     this.ngTemplate="ngTemplate";
     this.ng_template=this.snake_case(this.ngTemplate);
     this.ngUse="ngUse";
@@ -55,7 +72,33 @@ var ngHtmlBuilderModule=new function(){
 angular.module(
     "ngHtmlBuilder",
     []
-    ).directive(ngHtmlBuilderModule.ngTemplate,function(){return {
+    ).directive(ngHtmlBuilderModule.ngIncludeOnce,function($compile){return {
+        restrict:"E",
+        link:function(scope,element,attrs,controller,transcludeFn){
+            var html=element.html();
+            element.html("");
+            ngHtmlBuilderModule.sha256(html).then(function(hash){
+                if (hash) {
+                    hash=ngHtmlBuilderModule.buf2hex(hash);
+                    var key="k"+hash;
+                    if (ngHtmlBuilderModule.htmlBlockTable[key]){
+                        console.debug("DEBUG: HTML block loaded already: "+hash+" at "+ngHtmlBuilderModule.htmlBlockTable[key].toString());
+                        html=false;
+                    } else {
+                        ngHtmlBuilderModule.htmlBlockTable[key]=new Date();    
+                    }
+                }
+                if (html){
+                    var el=angular.element(html);
+                    $compile(el.contents())(scope);
+                    element.replaceWith(el);
+                    console.debug("DEBUG: New HTML block: "+hash);
+                } else {
+                    element.remove();
+                }
+            });
+        }
+    }}).directive(ngHtmlBuilderModule.ngTemplate,function(){return {
         restrict:"C",
         link:function(scope,element,attrs,controller,transcludeFn){
             element.data(
