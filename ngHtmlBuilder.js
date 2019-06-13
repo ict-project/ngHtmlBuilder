@@ -9,7 +9,7 @@ var ngHtmlBuilderModule=new function(){
             return(output);
         }
         console.warn("WARN: Module window.crypto not present!!!");
-        return(false);
+        return(new Promise(function(resolve,reject){resolve(false);}));
     };
     this.buf2hex=function(buffer){
         return(Array.prototype.map.call(new Uint8Array(buffer),x=>('00'+x.toString(16)).slice(-2)).join(''));
