@@ -79,6 +79,7 @@ angular.module(
     []
     ).directive(ngHtmlBuilderModule.ngIncludeOnce,function($compile){return {
         restrict:"E",
+        priority: 1000,
         link:function(scope,element,attrs,controller,transcludeFn){
             var m=ngHtmlBuilderModule;
             var html=element.html();
@@ -122,6 +123,7 @@ angular.module(
         }
     }}).directive(ngHtmlBuilderModule.ngClone,function($compile){return {
         restrict:"E",
+        priority: 500,
         link:function(scope,element,attrs,controller,transcludeFn){
             var m=ngHtmlBuilderModule;
             var selector="";
