@@ -1,7 +1,8 @@
 var ngHtmlBuilderModule=new function(){
     var promiseChain=new Promise(function(resolve,reject){resolve(false);});
     this.addPromise=function(next){
-        promiseChain=promiseChain.then(function(){return(next);});
+        promiseChain=promiseChain.then(next);
+        promiseChain.catch(next);
     };
     this.htmlBlockTable={};
     this.sha256=function(input){
@@ -82,26 +83,28 @@ angular.module(
             var m=ngHtmlBuilderModule;
             var html=element.html();
             element.html("");
-            m.addPromise(m.sha256(html).then(function(hash){
-                if (hash) {
-                    hash=m.buf2hex(hash);
-                    var key="k"+hash;
-                    if (m.htmlBlockTable[key]){
-                        console.debug("DEBUG: HTML block loaded already: "+hash+" at "+m.htmlBlockTable[key].toString());
-                        html=false;
-                    } else {
-                        m.htmlBlockTable[key]=new Date();    
+            if (html) m.addPromise(function(){
+                return(m.sha256(html).then(function(hash){
+                    if (hash) {
+                        hash=m.buf2hex(hash);
+                        var key="k"+hash;
+                        if (m.htmlBlockTable[key]){
+                            console.debug("DEBUG: HTML block loaded already: "+hash+" at "+m.htmlBlockTable[key].toString());
+                            html=false;
+                        } else {
+                            m.htmlBlockTable[key]=new Date();    
+                        }
                     }
-                }
-                if (html){
-                    var el=angular.element(html);
-                    $compile(el.contents())(scope);
-                    element.replaceWith(el);
-                    console.debug("DEBUG: New HTML block: "+hash);
-                } else {
-                    element.remove();
-                }
-            }));
+                    if (html){
+                        var el=angular.element(html);
+                        $compile(el.contents())(scope);
+                        element.replaceWith(el);
+                        console.debug("DEBUG: New HTML block: "+hash);
+                    } else {
+                        element.remove();
+                    }
+                }))
+            });
         }
     }}).directive(ngHtmlBuilderModule.ngTemplate,function(){return {
         restrict:"C",
