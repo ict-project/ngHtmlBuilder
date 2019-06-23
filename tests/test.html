@@ -53,14 +53,11 @@
                     <p>Default content no 1</p>
                 </ng-use>
                 <ng-use ng-selector="[ng-template-content='2']">
-                    <p>Default content no 2 - {{testValue}}</p>
+                    <p>Default content no 2 - [{{testValue}}]</p>
                 </ng-use>
             </div>
         </div>
-        <!-- Template 3 -->
-        <div class="container ng-template" id="ng-template-container">
-            <ng-use ng-selector="> *"/>
-        </div>
+        <ng-include-once src="'test-container.html'" ></ng-include-once>
 
         <ng-clone ng-selector="#ng-template-container" >
             <!-- Clone no 1 -->
@@ -82,17 +79,14 @@
             <!-- Clone no 3 -->
             <ng-clone ng-selector="#ng-template-panel">
                 <div ng-template-content=2>
-                    <p>{{testValue}} - Witaj świecie 2 !!!</p>
+                    <p>[{{testValue}}] - Witaj świecie 2 !!!</p>
                 </div>
             </ng-clone>
         </ng-clone>
         <ng-clone ng-selector="#ng-template-container" >
-            <ng-include-once><p>Only once</p></ng-include-once>
-            <ng-include-once><p>Only once</p></ng-include-once>
-            <ng-include-once><p>Only once: 2</p></ng-include-once>
-            <ng-include-once><p>Only once: 2</p></ng-include-once>
-            <ng-include-once><p>Only once</p></ng-include-once>
-            <ng-include-once><p>Only once: 2</p></ng-include-once>
+            <ng-include-once src="'test-1.html'" ></ng-include-once>
+            <ng-include-once src="'test-2.html'" ></ng-include-once>
+            <ng-include-once src="'test-2.html'" ></ng-include-once>
         </ng-clone>
     </body>
 </html>
