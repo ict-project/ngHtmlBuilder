@@ -43,7 +43,6 @@ Clone before compilation:
 Clone after compilation:
 ```html
 <span class="" id="template-1-nn8gdge5at630dbnmm5u"><span class="ng-scope">example</span></span>
-
 ```
 
 Element `ng-clone` is replaced (entirely) by selected template. 
