@@ -193,7 +193,12 @@
                                     if (found[0]){//If found then use it
                                         template.replaceWith(found);
                                     } else {//If not found then use children of template elements (default content)
-                                        template.replaceWith(template.children().clone());
+                                        var children=template.children();
+                                        if (children[0]){ //If are present
+                                            template.replaceWith(children.clone());
+                                        } else {
+                                            template.remove();
+                                        }
                                         return(true);//Go deeper
                                     }
                                 } catch (e){
