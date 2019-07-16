@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html ng-app="exampleApp">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+            
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+            <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <title>ngHtmlBuilder - Examples</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+        <script src="../ngHtmlBuilder.js"></script>
+        <link rel="stylesheet" href="../ngHtmlBuilder.css" />
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+        <style>
+            example-html {display: none !important;}
+            example-template {display: none !important;}
+            example-clone {display: none !important;}
+        </style>
+        <script>
+            function addCode(element){
+                var html=element.html();
+                var span=angular.element("<span></span>");
+                html=html.replace(/:dollar:/g,"$");
+                span.text("```html\n"+html+"\n```\n");
+                return(span);
+            }
+            function addText(text){
+                return("<span>"+text+"\n</span>");
+            }
+            angular.module("exampleApp",["ngHtmlBuilder"])
+                .controller("bodyCtrl",function($scope){
+                })
+                .directive("exampleHtml",function(){return {
+                    restrict:"E",
+                    priority: 2000,
+                    link:function(scope,element,attrs,controller,transcludeFn){
+                        var h=element.html();
+                        var e=angular.element("<span>\n"+h+"\n</span>");
+                        element.after(addCode(e));
+                    },
+                }})
+                .directive("exampleTemplate",function(){return {
+                    restrict:"E",
+                    priority: 2000,
+                    link:function(scope,element,attrs,controller,transcludeFn){
+                        var d=element.children().data("ng-template");
+                        var e=angular.element("<span>\n"+d.html+"\n</span>");
+                        for (var key in d.replace) if (d.replace.hasOwnProperty(key)) {
+                            e.children().attr(key.replace(/\$/g,":dollar:"),d.replace[key]);
+                        }
+                        element.after(addCode(e));
+                        element.after(addText("Template:"));
+                    },
+                }})
+                .directive("exampleClone",function($timeout){return {
+                    restrict:"E",
+                    priority: 2000,
+                    link:function(scope,element,attrs,controller,transcludeFn){
+                        element.data("example-clone",addCode(element));
+                        $timeout(function(){
+                            element.after(addCode(element));
+                            element.after(addText("Clone after compilation:"));
+                            element.after(element.data("example-clone"));
+                            element.after(addText("Clone before compilation:"));
+                        },1000);
+                    },
+                }});
+        </script>
+    </head>
+    <body ng-controller="bodyCtrl"><div class="container-fluid"><pre>
+# ngHtmlBuilder
+
+ngHtmlBuilder is AngularJS module for HTML templating. 
+It is similar to transclude feature except that all necessary for template information is placed directly in HTML.
+
+The module defines four new directives:
+* `ng-template` - Defines a template in HTML;
+* `ng-clone` - Instantiates HTML element from the template;
+* `ng-use` - Puts HTML elements given when cloning inside the template;
+* `ng-include-once` - Adds HTML from given source (but only if not added before).
+
+## Usage
+
+In order to use ngHtmlBuilder module it must be added after Angular link.
+
+Like this (URLs must be corrected accordingly):
+<example-html>
+<script src="ngHtmlBuilder.js"></script>
+<link rel="stylesheet" href="ngHtmlBuilder.css" />
+</example-html>
+
+## Examples
+
+### Simple example
+
+First, template must be defined.
+
+<example-template>
+<span class="ng-template" id="template-1">example</span>
+</example-template>
+
+The template must have `ng-template` class assigned (it's removed during cloning)
+and may have it's own unique ID (it's suffixed with random string during cloning).
+
+Then, the template may be instantiated anywhere, as many times is needed.
+
+<example-clone>
+<ng-clone ng-selector="#template-1"></ng-clone>
+</example-clone>
+
+Element `ng-clone` is replaced (entirely) by selected template. 
+Selection is made by `ng-selector` attribute, where proper selector should be given 
+(in order to find proper template). Search is done in `document` context 
+(first occurrence).
+
+### String parameters
+
+In the template a string parameter may be used.
+
+<example-template>
+<span class="ng-template" id="template-2" >$test$</span>
+</example-template>
+
+The name of the parameter (here `$test$`) must have dollar sign
+at the beginning and at the end. 
+Each occurrence of the name of such parameter will be replaced 
+with value during cloning (only if value is given).
+
+A value can be provided as attribute of `ng-clone` element with the same name.
+
+<example-clone>
+<ng-clone ng-selector="#template-2" $test$="Ala ma kota"></ng-clone>
+</example-clone>
+<example-clone>
+<ng-clone ng-selector="#template-2" $test$="Ala ma dwa koty"></ng-clone>
+</example-clone>
+
+If the value is not provided in `ng-clone` element it won't be replaced.
+
+<example-clone>
+<ng-clone ng-selector="#template-2"></ng-clone>
+</example-clone>
+
+To solve this problem a default value may be provided in the template element.
+It has to be an attribute of top most template element with the same name.
+
+<example-template>
+<span class="ng-template" id="template-3" $test$="Wartość domyślna">$test$</span>
+</example-template>
+<example-clone>
+<ng-clone ng-selector="#template-3" $test$="Ala nie ma kota"></ng-clone>
+</example-clone>
+<example-clone>
+<ng-clone ng-selector="#template-3" ></ng-clone>
+</example-clone>
+
+### Input elements
+
+The template may use an HTML element that is provided during cloning.
+In such case `ng-use` directive must be placed in template.
+
+<example-template>
+<div class="panel panel-default ng-template" id="template-4">
+    <div class="panel-body">
+        <ng-use ng-selector="[template-content='1']"></ng-use>
+    </div>
+</div>
+</example-template>
+
+When template is cloned `ng-clone` may have child elements.
+In this context `ng-use` directive searches 
+for elements that will replace it. 
+Selector from `ng-selector` attribute is used for this purpose.
+
+<example-clone>
+<ng-clone ng-selector="#template-4">
+    <span template-content="1">Tutaj tekst</span>
+</ng-clone>
+</example-clone>
+
+If no input HTML elements was found during cloning, default content will be used.
+The default content may be provided in `ng-use` element.
+
+
+<example-template>
+<div class="panel panel-default ng-template" id="template-5">
+    <div class="panel-body">
+        <ng-use ng-selector="[template-content='1']">
+            <span>Domyślna treść</span>
+        </ng-use>
+    </div>
+</div>
+</example-template>
+<example-clone>
+<ng-clone ng-selector="#template-5">
+    <span template-content="1">Tutaj tekst</span>
+</ng-clone>
+</example-clone>
+<example-clone>
+<ng-clone ng-selector="#template-5"></ng-clone>
+</example-clone>
+
+### Include HTML
+
+Templates may be defined in different files and then included to the main HTML.
+In order to do that `ng-include-once` directive must be used.
+
+<example-html>
+<ng-include-once src="'example.html'" ></ng-include-once>
+</example-html>
+
+HTML source included this way is checked if has been loaded already.
+If so, the include is omitted.
+
+</pre></div></body></html>
